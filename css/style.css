@@ -1,0 +1,14 @@
+@import "imports/_reset.css" layer(reset);
+
+body {
+  font-family: system-ui;
+
+  & p {
+    font-size: 1.25rem;
+    color: hsl(from dodgerblue h s calc(l - 30%));
+  }
+
+  * + * {
+    margin-top: 1em;
+  }
+}
