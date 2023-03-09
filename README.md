@@ -40,6 +40,16 @@ module.exports = (eleventyConfig) => {
 };
 ```
 
+⚠️ **Important**: The files will end up in `collections.all` and appear in places like RSS feeds where you may be using the "all" collection. To prevent that, [a temporary workaround](https://github.com/11ty/eleventy/discussions/2850#discussioncomment-5254892) is to create a directory data file to exclude your Sass files.
+
+Place the following in the directory containing your Sass files. As an example, for a directory called `css` the file would be called `css/css.json`:
+
+```js
+{
+  "eleventyExcludeFromCollections": true
+}
+```
+
 Then, write your CSS using any organization pattern you like as long as it lives within your defined [Eleventy input directory](https://www.11ty.dev/docs/config/#input-directory).
 
 > **Note**
