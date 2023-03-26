@@ -20,6 +20,7 @@ It includes enables the following LightningCSS flags by default:
 - [bundling](https://lightningcss.dev/bundling.html) - enables including other files via the `@import` syntax
 - [nesting](https://lightningcss.dev/transpilation.html#nesting)
 - [minify](https://lightningcss.dev/minification.html)
+- [custom media queries](https://lightningcss.dev/transpilation.html#custom-media-queries)
 
 ## Usage
 
