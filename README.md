@@ -63,7 +63,9 @@ Then, write your CSS using any organization pattern you like as long as it lives
 | ------------- | ------- | ------- |
 | importPrefix  | string  | '\_'    |
 | nesting       | boolean | true    |
+| customMedia   | boolean | true    |
 | minify        | boolean | true    |
+| sourceMap     | boolean | false   |
 | visitors      | array   | []      |
 | customAtRules | object  | {}      |
 

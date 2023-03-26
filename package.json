@@ -1,6 +1,6 @@
 {
   "name": "@11tyrocks/eleventy-plugin-lightningcss",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Process CSS in Eleventy (11ty) with LightningCSS to minify, prefix, and add future CSS support.",
   "homepage": "",
   "main": ".eleventy.js",

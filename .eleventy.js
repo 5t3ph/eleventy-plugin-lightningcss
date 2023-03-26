@@ -47,12 +47,22 @@ module.exports = (eleventyConfig, options) => {
   const defaults = {
     importPrefix: "_",
     nesting: true,
+    customMedia: true,
     minify: true,
+    sourceMap: false,
     visitors: [],
     customAtRules: {},
   };
 
-  const { importPrefix, nesting, minify, visitors, customAtRules } = {
+  const {
+    importPrefix,
+    nesting,
+    customMedia,
+    minify,
+    sourceMap,
+    visitors,
+    customAtRules,
+  } = {
     ...defaults,
     ...options,
   };
@@ -75,10 +85,11 @@ module.exports = (eleventyConfig, options) => {
         let { code } = await bundle({
           filename: inputPath,
           minify,
-          sourceMap: false,
+          sourceMap,
           targets,
           drafts: {
             nesting,
+            customMedia,
           },
           customAtRules,
           visitor: composeVisitors(visitors),
