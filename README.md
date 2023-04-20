@@ -70,6 +70,16 @@ Then, write your CSS using any organization pattern you like as long as it lives
 | visitors      | array   | []      |
 | customAtRules | object  | {}      |
 
+### Source maps
+
+If you enable source maps, you'll also need to pass them through to your public build.
+
+Add the following to your Eleventy config.
+
+```js
+eleventyConfig.addPassthroughCopy("**/*.map");
+```
+
 ### Bundling Import Prefix
 
 The plugin defaults to setting up 11ty to ignore CSS filenames prefixed with `_` (configure with `importPrefix`) so that those files do not end up as separate stylesheets in your final build. That way you can signify which CSS files you are including via the `@import` syntax.

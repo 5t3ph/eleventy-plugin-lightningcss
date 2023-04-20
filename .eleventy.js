@@ -49,7 +49,8 @@ module.exports = (eleventyConfig, options) => {
     nesting: true,
     customMedia: true,
     minify: true,
-    sourceMap: false,
+    // TODO: change default back to false once this works
+    sourceMap: true,
     visitors: [],
     customAtRules: {},
   };
@@ -82,7 +83,7 @@ module.exports = (eleventyConfig, options) => {
       let targets = browserslistToTargets(browserslist(browserslistTargets));
 
       return async () => {
-        let { code } = await bundle({
+        let { code, map } = await bundle({
           filename: inputPath,
           minify,
           sourceMap,
@@ -94,7 +95,26 @@ module.exports = (eleventyConfig, options) => {
           customAtRules,
           visitor: composeVisitors(visitors),
         });
-        return code;
+
+        let mapComment = "";
+
+        if (sourceMap) {
+          const fileLocation = path.resolve(
+            __dirname,
+            fs.realpathSync(inputPath)
+          );
+
+          const sourceMapName = `${parsed.base}.map`;
+          const sourceMapFile = `${path.dirname(
+            fileLocation
+          )}/${sourceMapName}`;
+
+          fs.writeFileSync(sourceMapFile, map);
+
+          mapComment = `/*# sourceMappingURL=${sourceMapName} */ `;
+        }
+
+        return code + "\n\n" + mapComment;
       };
     },
   });
