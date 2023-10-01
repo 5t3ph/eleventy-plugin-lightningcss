@@ -2,3 +2,7 @@
   box-sizing: border-box;
   margin: 0;
 }
+
+h2 {
+  font-size: 3rem;
+}

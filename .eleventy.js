@@ -79,6 +79,24 @@ module.exports = (eleventyConfig, options) => {
         return;
       }
 
+      // Support @import triggering regeneration for incremental builds
+      // h/t @julientaq for the fix
+      if (_inputContent.includes("@import")) {
+        // for each file create a list of files to look at
+        const fileList = [];
+
+        // get a list of import on the file your reading
+        const importRuleRegex =
+          /@import\s+(?:url\()?['"]?([^'"\);]+)['"]?\)?.*;/g;
+
+        let match;
+        while ((match = importRuleRegex.exec(_inputContent))) {
+          fileList.push(parsed.dir + "/" + match[1]);
+        }
+
+        this.addDependencies(inputPath, fileList);
+      }
+
       let targets = browserslistToTargets(browserslist(browserslistTargets));
 
       return async () => {

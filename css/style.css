@@ -1,4 +1,5 @@
 @import "imports/_reset.css" layer(reset);
+@import "./_partial.css";
 
 body {
   container: body / inline-size;
