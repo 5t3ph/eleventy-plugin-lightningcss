@@ -29,10 +29,11 @@
     "url": "https://github.com/5t3ph/eleventy-plugin-lightningcss/issues"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^2.0.1"
+    "@11ty/eleventy": "^3.0.0-beta.1"
   },
   "dependencies": {
     "browserslist": "^4.23.0",
+    "gray-matter": "^4.0.3",
     "lightningcss": "^1.24.1"
   }
 }

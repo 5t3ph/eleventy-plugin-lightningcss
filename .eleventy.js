@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const browserslist = require("browserslist");
+const matter = require("gray-matter");
 const {
   bundle,
   browserslistToTargets,
@@ -21,7 +22,7 @@ try {
     try {
       const browserslistrc = path.resolve(
         __dirname,
-        fs.realpathSync(".browserslistrc")
+        fs.realpathSync(".browserslistrc"),
       );
 
       fs.readFile(browserslistrc, "utf8", (_err, data) => {
@@ -52,6 +53,7 @@ module.exports = (eleventyConfig, options) => {
     sourceMap: false,
     visitors: [],
     customAtRules: {},
+    debug: false,
   };
 
   const {
@@ -62,6 +64,7 @@ module.exports = (eleventyConfig, options) => {
     sourceMap,
     visitors,
     customAtRules,
+    debug,
   } = {
     ...defaults,
     ...options,
@@ -73,11 +76,29 @@ module.exports = (eleventyConfig, options) => {
   // Process CSS with LightningCSS
   eleventyConfig.addExtension("css", {
     outputFileExtension: "css",
-    compile: async function (_inputContent, inputPath) {
+    compile: async function (_inputContent, inputPath, plouf) {
+      console.log("plouf", plouf);
+      // log to find the content
       let parsed = path.parse(inputPath);
+
+      console.log(parsed);
+      // if the file starts with the `importPrefix`do do anything with it.
       if (parsed.name.startsWith(importPrefix)) {
+        console.log(importPrefix);
+        if (debug) {
+          console.log(`${parsed.name} was marked as dependency`);
+        }
         return;
       }
+
+      // then let’s convert it
+
+      console.log("parsed");
+
+      // log the parsed block
+      let fileContent = matter(parsed);
+      // console.log("matterized content", fileContent);
+      console.log("matter", fileContent);
 
       // Support @import triggering regeneration for incremental builds
       // h/t @julientaq for the fix
