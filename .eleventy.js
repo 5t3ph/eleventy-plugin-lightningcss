@@ -4,6 +4,7 @@ const browserslist = require("browserslist");
 const matter = require("gray-matter");
 const {
   bundle,
+  transform,
   browserslistToTargets,
   composeVisitors,
 } = require("lightningcss");
@@ -45,6 +46,7 @@ try {
 }
 
 module.exports = (eleventyConfig, options) => {
+  console.log(eleventyConfig);
   const defaults = {
     importPrefix: "_",
     nesting: true,
@@ -93,15 +95,16 @@ module.exports = (eleventyConfig, options) => {
 
       // then let’s convert it
 
-      console.log("parsed");
-
       // log the parsed block
-      let fileContent = matter(parsed);
+      // let fileContent = matter(parsed);
       // console.log("matterized content", fileContent);
-      console.log("matter", fileContent);
+      // console.log("matter", fileContent);
 
       // Support @import triggering regeneration for incremental builds
       // h/t @julientaq for the fix
+      console.log("matter", matter(_inputContent));
+      console.log(_inputContent);
+
       if (_inputContent.includes("@import")) {
         // for each file create a list of files to look at
         const fileList = [];
@@ -120,9 +123,19 @@ module.exports = (eleventyConfig, options) => {
 
       let targets = browserslistToTargets(browserslist(browserslistTargets));
 
+      const styles = parsed.content;
+      const filename = parsed.data?.permalink
+        ? parsed.data.permalink
+        : inputPath;
+
       return async () => {
-        let { code } = await bundle({
-          filename: inputPath,
+        let { code } = await transform({
+          filename: filename,
+          // the code is a buffer from the content from gray matter
+          // code: Buffer.from(styles),
+          // code,
+          // code,
+          code: Buffer.from(_inputContent),
           minify,
           sourceMap,
           targets,
@@ -133,6 +146,7 @@ module.exports = (eleventyConfig, options) => {
           customAtRules,
           visitor: composeVisitors(visitors),
         });
+        console.log(code);
         return code;
       };
     },
