@@ -111,13 +111,9 @@ module.exports = (eleventyConfig, options) => {
 
       let targets = browserslistToTargets(browserslist(browserslistTargets));
 
-      const filename = parsed.data?.permalink
-        ? parsed.data.permalink
-        : inputPath;
-
       return async (data) => {
         let { code, map } = await bundleAsync({
-          filename: filename,
+          filename: data.page.outputPath,
           // code: Buffer.from(_inputContent),
           minify,
           sourceMap,
@@ -168,6 +164,7 @@ module.exports = (eleventyConfig, options) => {
   });
 };
 
+/*remove yaml front matter from a string*/
 function removeYaml(content) {
   const yamlFrontmatterRegex = /^---\s*[\s\S]*?\s*---\s*/;
   return content.replace(yamlFrontmatterRegex, "");
