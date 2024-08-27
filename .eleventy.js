@@ -128,7 +128,6 @@ module.exports = (eleventyConfig, options) => {
           visitor: composeVisitors(visitors),
           resolver: {
             read(filePath) {
-              // console.log(filePath);
               // Read the file content
               let content = fs.readFileSync(filePath, "utf8");
 
@@ -146,10 +145,14 @@ module.exports = (eleventyConfig, options) => {
         let mapComment = "";
 
         const link = path.parse(data.page.outputPath);
+
         if (sourceMap) {
           const sourceMapLocation = `./${link.name}.map`;
 
           // Get the directory name from the sourcemap location
+          let url = fs.mkdirSync(link.dir, {
+            recursive: true,
+          });
 
           // Ensure the directory exists
           fs.writeFileSync(data.page.outputPath.replace(".css", ".map"), map);
@@ -163,7 +166,6 @@ module.exports = (eleventyConfig, options) => {
     },
   });
 };
-
 /*remove yaml front matter from a string*/
 function removeYaml(content) {
   const yamlFrontmatterRegex = /^---\s*[\s\S]*?\s*---\s*/;
