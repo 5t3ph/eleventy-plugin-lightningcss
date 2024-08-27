@@ -1,3 +1,7 @@
+---
+permalink: "/css/thisisworking/permalink.css"
+---
+
 @import "imports/_reset.css" layer(reset);
 @import "./_partial.css";
 

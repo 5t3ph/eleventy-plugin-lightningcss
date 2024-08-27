@@ -1,10 +1,9 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const browserslist = require("browserslist");
-const matter = require("gray-matter");
+
 const {
-  bundle,
-  transform,
+  bundleAsync,
   browserslistToTargets,
   composeVisitors,
 } = require("lightningcss");
@@ -46,13 +45,12 @@ try {
 }
 
 module.exports = (eleventyConfig, options) => {
-  console.log(eleventyConfig);
   const defaults = {
     importPrefix: "_",
     nesting: true,
     customMedia: true,
     minify: true,
-    sourceMap: false,
+    sourceMap: true,
     visitors: [],
     customAtRules: {},
     debug: false,
@@ -78,33 +76,23 @@ module.exports = (eleventyConfig, options) => {
   // Process CSS with LightningCSS
   eleventyConfig.addExtension("css", {
     outputFileExtension: "css",
-    compile: async function (_inputContent, inputPath, plouf) {
-      console.log("plouf", plouf);
+    compile: async function (_inputContent, inputPath) {
       // log to find the content
       let parsed = path.parse(inputPath);
 
-      console.log(parsed);
       // if the file starts with the `importPrefix`do do anything with it.
       if (parsed.name.startsWith(importPrefix)) {
-        console.log(importPrefix);
+        // if debug declare dependencies in the log
         if (debug) {
-          console.log(`${parsed.name} was marked as dependency`);
+          console.log(
+            `[11ty-lightningCSS] ${parsed.dir}${parsed.base} was marked as dependency`,
+          );
         }
         return;
       }
 
-      // then let’s convert it
-
-      // log the parsed block
-      // let fileContent = matter(parsed);
-      // console.log("matterized content", fileContent);
-      // console.log("matter", fileContent);
-
       // Support @import triggering regeneration for incremental builds
       // h/t @julientaq for the fix
-      console.log("matter", matter(_inputContent));
-      console.log(_inputContent);
-
       if (_inputContent.includes("@import")) {
         // for each file create a list of files to look at
         const fileList = [];
@@ -123,19 +111,14 @@ module.exports = (eleventyConfig, options) => {
 
       let targets = browserslistToTargets(browserslist(browserslistTargets));
 
-      const styles = parsed.content;
       const filename = parsed.data?.permalink
         ? parsed.data.permalink
         : inputPath;
 
-      return async () => {
-        let { code } = await transform({
+      return async (data) => {
+        let { code, map } = await bundleAsync({
           filename: filename,
-          // the code is a buffer from the content from gray matter
-          // code: Buffer.from(styles),
-          // code,
-          // code,
-          code: Buffer.from(_inputContent),
+          // code: Buffer.from(_inputContent),
           minify,
           sourceMap,
           targets,
@@ -145,10 +128,47 @@ module.exports = (eleventyConfig, options) => {
           },
           customAtRules,
           visitor: composeVisitors(visitors),
+          resolver: {
+            read(filePath) {
+              // Read the file content
+              let content = fs.readFileSync(filePath, "utf8");
+
+              // Apply a transformation: Replace a placeholder with a value
+              content = removeYaml(content);
+              // Return the transformed content
+              return content;
+            },
+            resolve(specifier, from) {
+              return path.resolve(path.dirname(from), specifier);
+            },
+          },
         });
-        console.log(code);
-        return code;
+
+        let mapComment = "";
+
+        const link = path.parse(data.page.outputPath);
+        if (sourceMap) {
+          const sourceMapLocation = `./${link.name}.map`;
+
+          // Get the directory name from the sourcemap location
+          fs.mkdirSync(path.parse(data.page.outputPath).dir + "/", {
+            recursive: true,
+          });
+
+          // Ensure the directory exists
+          fs.writeFileSync(data.page.outputPath.replace(".css", ".map"), map);
+
+          //write the comment in the css to set the source map
+          mapComment = `/*# sourceMappingURL=${sourceMapLocation} */`;
+        }
+
+        return code + "\n" + mapComment;
       };
     },
   });
 };
+
+function removeYaml(content) {
+  const yamlFrontmatterRegex = /^---\s*[\s\S]*?\s*---\s*/;
+  return content.replace(yamlFrontmatterRegex, "");
+}

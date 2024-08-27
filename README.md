@@ -60,15 +60,16 @@ Then, write your CSS using any organization pattern you like as long as it lives
 
 ### Base options
 
-| Option        | Type    | Default |
-| ------------- | ------- | ------- |
-| importPrefix  | string  | '\_'    |
-| nesting       | boolean | true    |
-| customMedia   | boolean | true    |
-| minify        | boolean | true    |
-| sourceMap     | boolean | false   |
-| visitors      | array   | []      |
-| customAtRules | object  | {}      |
+| Option        | Type    | Default | Use                                                                                                     |
+| ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| importPrefix  | string  | '\_'    | file starting with this prefix will have not output (they can still be used with `@import` for example) |
+| nesting       | boolean | true    | allows for CSS nesting                                                                                  |
+| customMedia   | boolean | true    | allows for custom media queries                                                                         |
+| minify        | boolean | true    | render a minified version                                                                               |
+| sourceMap     | boolean | false   | generate a source map file                                                                              |
+| visitors      | array   | []      | add visitors (read the documentation from lightningCSS)                                                 |
+| customAtRules | object  | {}      | custom `@something` (read the documentation from lightningCSS)                                          |
+| debug         | boolean | false   | show more information in eleventy console                                                               |
 
 ### Bundling Import Prefix
 
@@ -139,3 +140,11 @@ module.exports = (eleventyConfig) => {
 ## How does it work?
 
 This plugin uses Eleventy's `addTemplateFormats` and `addExtension` features to essentiallly recognize CSS as a first-class templating language, and add custom processing. Since it makes CSS into a templating language, changes are applied during local development hot-reloading without a delay or requiring a manual browser refresh.
+
+## Source map and permalink
+
+Your CSS file can start with a front matter than eleventy will use, which can be pretty useful to set a permalink for a css file.
+
+We added a custom resolver to the bundle to remove all the frontmatter before it gets out.
+
+A source map will be added for each the file, unless the `options.sourcemap` is set to false.
