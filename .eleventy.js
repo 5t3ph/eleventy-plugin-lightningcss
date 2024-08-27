@@ -128,7 +128,7 @@ module.exports = (eleventyConfig, options) => {
           visitor: composeVisitors(visitors),
           resolver: {
             read(filePath) {
-              console.log(filePath);
+              // console.log(filePath);
               // Read the file content
               let content = fs.readFileSync(filePath, "utf8");
 
