@@ -111,9 +111,11 @@ module.exports = (eleventyConfig, options) => {
 
       let targets = browserslistToTargets(browserslist(browserslistTargets));
 
+      //create the folder if it doesnt exit
+
       return async (data) => {
         let { code, map } = await bundleAsync({
-          filename: data.page.outputPath,
+          filename: inputPath,
           // code: Buffer.from(_inputContent),
           minify,
           sourceMap,
@@ -126,6 +128,7 @@ module.exports = (eleventyConfig, options) => {
           visitor: composeVisitors(visitors),
           resolver: {
             read(filePath) {
+              console.log(filePath);
               // Read the file content
               let content = fs.readFileSync(filePath, "utf8");
 
@@ -147,9 +150,6 @@ module.exports = (eleventyConfig, options) => {
           const sourceMapLocation = `./${link.name}.map`;
 
           // Get the directory name from the sourcemap location
-          fs.mkdirSync(path.parse(data.page.outputPath).dir + "/", {
-            recursive: true,
-          });
 
           // Ensure the directory exists
           fs.writeFileSync(data.page.outputPath.replace(".css", ".map"), map);
