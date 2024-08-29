@@ -1,8 +1,9 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const browserslist = require("browserslist");
+
 const {
-  bundle,
+  bundleAsync,
   browserslistToTargets,
   composeVisitors,
 } = require("lightningcss");
@@ -21,7 +22,7 @@ try {
     try {
       const browserslistrc = path.resolve(
         __dirname,
-        fs.realpathSync(".browserslistrc")
+        fs.realpathSync(".browserslistrc"),
       );
 
       fs.readFile(browserslistrc, "utf8", (_err, data) => {
@@ -49,9 +50,10 @@ module.exports = (eleventyConfig, options) => {
     nesting: true,
     customMedia: true,
     minify: true,
-    sourceMap: false,
+    sourceMap: true,
     visitors: [],
     customAtRules: {},
+    debug: false,
   };
 
   const {
@@ -62,6 +64,7 @@ module.exports = (eleventyConfig, options) => {
     sourceMap,
     visitors,
     customAtRules,
+    debug,
   } = {
     ...defaults,
     ...options,
@@ -74,8 +77,17 @@ module.exports = (eleventyConfig, options) => {
   eleventyConfig.addExtension("css", {
     outputFileExtension: "css",
     compile: async function (_inputContent, inputPath) {
+      // log to find the content
       let parsed = path.parse(inputPath);
+
+      // if the file starts with the `importPrefix`do do anything with it.
       if (parsed.name.startsWith(importPrefix)) {
+        // if debug declare dependencies in the log
+        if (debug) {
+          console.log(
+            `[11ty-lightningCSS] ${parsed.dir}${parsed.base} was marked as dependency`,
+          );
+        }
         return;
       }
 
@@ -99,9 +111,12 @@ module.exports = (eleventyConfig, options) => {
 
       let targets = browserslistToTargets(browserslist(browserslistTargets));
 
-      return async () => {
-        let { code } = await bundle({
+      //create the folder if it doesnt exit
+
+      return async (data) => {
+        let { code, map } = await bundleAsync({
           filename: inputPath,
+          // code: Buffer.from(_inputContent),
           minify,
           sourceMap,
           targets,
@@ -111,9 +126,48 @@ module.exports = (eleventyConfig, options) => {
           },
           customAtRules,
           visitor: composeVisitors(visitors),
+          resolver: {
+            read(filePath) {
+              // Read the file content
+              let content = fs.readFileSync(filePath, "utf8");
+
+              // Apply a transformation: Replace a placeholder with a value
+              content = removeYaml(content);
+              // Return the transformed content
+              return content;
+            },
+            resolve(specifier, from) {
+              return path.resolve(path.dirname(from), specifier);
+            },
+          },
         });
-        return code;
+
+        let mapComment = "";
+
+        const link = path.parse(data.page.outputPath);
+
+        if (sourceMap) {
+          const sourceMapLocation = `./${link.name}.map`;
+
+          // Get the directory name from the sourcemap location
+          let url = fs.mkdirSync(link.dir, {
+            recursive: true,
+          });
+
+          // Ensure the directory exists
+          fs.writeFileSync(data.page.outputPath.replace(".css", ".map"), map);
+
+          //write the comment in the css to set the source map
+          mapComment = `/*# sourceMappingURL=${sourceMapLocation} */`;
+        }
+
+        return code + "\n" + mapComment;
       };
     },
   });
 };
+/*remove yaml front matter from a string*/
+function removeYaml(content) {
+  const yamlFrontmatterRegex = /^---\s*[\s\S]*?\s*---\s*/;
+  return content.replace(yamlFrontmatterRegex, "");
+}

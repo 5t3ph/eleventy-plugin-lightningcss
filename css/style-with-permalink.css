@@ -1,0 +1,36 @@
+---
+permalink: "/css/thisisworking/permalink.css"
+---
+
+@import "imports/_reset.css" layer(reset);
+@import "./_partial.css";
+
+body {
+  container: body / inline-size;
+  font-family: system-ui;
+
+  & p {
+    font-size: 1.25rem;
+    color: hsl(from dodgerblue h s calc(l - 30%));
+  }
+
+  * + * {
+    margin-top: 1em;
+  }
+}
+
+body:has(p) {
+  --paragraphs: true;
+}
+
+@container body (inline-size > 500px) {
+  p {
+    background-color: hsl(130 80% 90%);
+  }
+
+  @container style(--paragraphs: true) {
+    p:first-of-type {
+      font-weight: bold;
+    }
+  }
+}
