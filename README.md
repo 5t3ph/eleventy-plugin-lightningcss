@@ -15,7 +15,7 @@ Review [LightningCSS docs](https://lightningcss.dev/transpilation.html) to learn
 
 LightningCSS minifies, prefixes, and enables transpiling based on your browserslist (or the included default) to gain future-CSS support today, with graceful upgrading as browser support improves.
 
-It includes enables the following LightningCSS flags by default:
+It enables the following LightningCSS flags by default:
 
 - [bundling](https://lightningcss.dev/bundling.html) - enables including other files via the `@import` syntax
 - [nesting](https://lightningcss.dev/transpilation.html#nesting)
