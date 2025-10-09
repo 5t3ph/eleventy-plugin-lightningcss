@@ -7,7 +7,7 @@ Also respects either your package.json `browserslist` or a `.browserslistrc`, ot
 Review [LightningCSS docs](https://lightningcss.dev/transpilation.html) to learn more about what future CSS features are supported via syntax lowering, including color functions, media query ranges, logical properties, and more.
 
 > **Note**
-> Requires Eleventy v2 - review [upgrade considerations](https://11ty.rocks/posts/new-features-upgrade-considerations-eleventy-version-2/) if applying to an existing project.
+> Requires Eleventy v2 or higher
 
 <small>If you want Sass support as well, use my [Sass + LightningCSS plugin](https://github.com/5t3ph/eleventy-plugin-sass-lightningcss) instead!</small>
 
