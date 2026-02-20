@@ -73,6 +73,7 @@ module.exports = (eleventyConfig, options) => {
   // Process CSS with LightningCSS
   eleventyConfig.addExtension("css", {
     outputFileExtension: "css",
+    useLayouts: false,
     compile: async function (_inputContent, inputPath) {
       let parsed = path.parse(inputPath);
       if (parsed.name.startsWith(importPrefix)) {
